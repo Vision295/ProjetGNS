@@ -10,7 +10,7 @@ Au debut de la configuration pour routage : 1. configure terminal
 A la fin de chaque config faire : 1. end
                                   2. write memory
 
-pour changer le nom d'un routeur : 1. configure terminal
+pour changer le nom dun routeur : 1. configure terminal
                                    2. hostname <nom_routeur>
 
 
