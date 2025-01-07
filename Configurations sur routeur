@@ -9,4 +9,4 @@ pour changer le nom d'un routeur : 1. configure terminal
                                    2. hostname <nom_routeur>
 
 
-pour configurer une addresse ipv4 sur le routeur : 
+pour configurer une addresse ipv6 sur le routeur : 
