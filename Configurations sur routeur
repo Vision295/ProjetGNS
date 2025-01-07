@@ -2,11 +2,33 @@ Configurer le routeur:
 
 Au tout debut : 1. faire un enable
 
-A la fin de chaque config faire : 1. exit
+Au debut de la configuration pour routage : 1. configure terminal
+                                            2. ipv6 unicast-routing
+
+
+
+A la fin de chaque config faire : 1. end
                                   2. write memory
 
 pour changer le nom d'un routeur : 1. configure terminal
                                    2. hostname <nom_routeur>
 
 
-pour configurer une addresse ipv4 sur le routeur : 
+pour configurer une addresse ipv4 sur le routeur : 1. configure terminal
+                                                   2. interface <nom_interface>
+                                                   3. ipv6 address <ip_address/subnet>
+                                                   4. no shutdown
+
+pour configurer OSPF : 1. configure terminal
+                       2. ipv6 router ospf <process-id>
+                       3. router-id <router-id>
+
+ajouter une interface dans OSPF : 1. configure terminal
+                                  2. interface <nom_interface>
+                                  3. ipv6 ospf <process-id> area <area-id>
+
+
+ajouter addresse de loopback : 1. configure terminal
+                               2. interface Loopback0
+                               3. ipv6 address 2001:db8:1::1/128
+                               4. no shutdown
