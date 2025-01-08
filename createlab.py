@@ -8,21 +8,20 @@ server = gns3fy.Gns3Connector("http://localhost:3080")
 lab = gns3fy.Project(name="testprojetGNS", connector=server)
 lab.get()
 lab.open()
-
 # Find the correct template ID for Ethernet switch
 ethernet_switch_template = None
 for template in server.get_templates():
-    if template["name"].lower() == "ethernet switch":
+    if template["name"].lower() == "c7200":
         ethernet_switch_template = template
         break
-
+     
 if not ethernet_switch_template:
     raise ValueError("Ethernet switch template not found")
 
 # Create node payload without using gns3fy Node class
 node_data = {
-    "name": "Ethernet-switch",
-    "node_type": "ethernet_switch",
+    "name": "S1",
+    "node_type": "dynamips",
     "compute_id": "local",
     "template_id": ethernet_switch_template["template_id"],
     "x":100,
