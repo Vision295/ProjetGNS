@@ -4,7 +4,7 @@ from gns3fy import Gns3Connector, Project, Node
 server = Gns3Connector("http://localhost:3080")  # Replace with your GNS3 server address if needed
 
 # Step 2: Access an existing project
-project_name = "testprojetGNS"
+project_name = "testprojetGNS3"
 project = Project(name=project_name, connector=server)
 project.get()  # Fetch the project details
 
