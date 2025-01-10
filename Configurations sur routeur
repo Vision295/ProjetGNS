@@ -14,7 +14,7 @@ pour changer le nom dun routeur : 1. configure terminal
                                    2. hostname <nom_routeur>
 
 
-pour configurer une addresse ipv4 sur le routeur : 1. configure terminal
+pour configurer une addresse ipv6 sur le routeur : 1. configure terminal
                                                    2. interface <nom_interface>
                                                    3. ipv6 address <ip_address/subnet>
                                                    4. no shutdown
@@ -32,3 +32,20 @@ ajouter addresse de loopback : 1. configure terminal
                                2. interface Loopback0
                                3. ipv6 address 2001:db8:1::1/128
                                4. no shutdown
+
+
+configurer protocole RIP sur un routeur : 1. configure terminal
+                                          2. ipv6 router rip <process_name>
+                                          3. redistribute connected
+                                          
+activer RIP sur une interface : 1. configure terminal
+                                2. interface <nom_interface>
+                                3. ipv6 rip <process_name> enable
+
+pour configurer bgp sur un routeur: 1. configure terminal
+                                    2. router bgp <as_number>
+                                    3. no bgp default ipv4-unicast
+                                    4. bgp router-id <router_id>
+                            
+pour creer un lien bgp vers un router voisin : 1. configure terminal
+                                               2. 
