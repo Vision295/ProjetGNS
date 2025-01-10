@@ -57,3 +57,6 @@ Pour advertise le network quon veut router avec BGP: 1. configure terminal
                                                      2. router bgp <as-number>
                                                      3. address-family ipv6 unicast
                                                      4. network <ipv6-prefix>
+
+Attention pour que iBGP fonctionne il faut une full mesh structure donc chaque routeur de lAS doit avoir un lien BGP
+avec le routeur de gateway
