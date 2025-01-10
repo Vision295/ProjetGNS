@@ -47,5 +47,13 @@ pour configurer bgp sur un routeur: 1. configure terminal
                                     3. no bgp default ipv4-unicast
                                     4. bgp router-id <router_id>
                             
-pour creer un lien bgp vers un router voisin : 1. configure terminal
-                                               2. 
+pour creer un lien bgp vers un routeur voisin : 1. configure terminal
+                                                2. router bgp <as_number>
+                                                3. neighbor <ipv6-address> remote-as <as-number>
+                                                4. address-family ipv6 unicast
+                                                5. neighbor <ipv6-address> activate
+
+Pour advertise le network quon veut router avec BGP: 1. configure terminal
+                                                     2. router bgp <as-number>
+                                                     3. address-family ipv6 unicast
+                                                     4. network <ipv6-prefix>
