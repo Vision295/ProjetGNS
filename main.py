@@ -1,23 +1,23 @@
-from gns3fy import Gns3Connector, Project, Node
+import json
+from pathlib import Path
 
-# Step 1: Connect to the GNS3 server
-server = Gns3Connector("http://localhost:3080")  # Replace with your GNS3 server address if needed
+local_path = Path("C:/Users/theop/GNS3/projects/testprojetGNS3/project-files/dynamips")
 
-# Step 2: Access an existing project
-project_name = "testprojetGNS3"
-project = Project(name=project_name, connector=server)
-project.get()  # Fetch the project details
+# List all directories in the given path
 
-# Check if the project is running
-if not project.status == "opened":
-    project.open()
 
-# Step 3: Create the router node
-router_node = Node(name="VPCS 1", node_type="vpcs", compute_id="local")
-# Step 4: Add the router node to the project
-router_node.create()  # Create the node in the GNS3 project
-print(f"Router {router_node.name} created with ID {router_node.node_id}")
+with open('intent.json', 'r') as file:
+      date = json.load(file)
 
-# Step 5: Start the router (optional)
-router_node.start()
-print(f"Router {router_node.name} started.")
+
+directories = [d for d in local_path.iterdir() if d.is_dir()]
+
+for d in directories:
+      dir = d / "configs/"
+      print(dir)
+      for item in dir.iterdir():
+            if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
+              with open(item, 'r') as file:
+                  content = file.read()
+                  print(content)
+
