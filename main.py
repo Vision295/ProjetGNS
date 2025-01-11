@@ -181,7 +181,6 @@ for d in directories:
       for item in dir.iterdir():
             if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
                   with open(item, 'r') as file:
-                        content = file.read()
                         print(content)
                         print(get_router_num(content))
                         exit()
