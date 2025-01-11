@@ -12,7 +12,6 @@ with open('intent.json', 'r') as file:
 
 directories = [d for d in local_path.iterdir() if d.is_dir()]
 
-
 def get_interface_name(interface_shortcut:str) -> str:
     match(interface_shortcut):
         case "g1/0" : return "gigabitethernet1/0"
