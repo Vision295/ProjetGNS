@@ -60,3 +60,12 @@ Pour advertise le network quon veut router avec BGP: 1. configure terminal
 
 Attention pour que iBGP fonctionne il faut une full mesh structure donc chaque routeur de lAS doit avoir un lien BGP
 avec le routeur de gateway
+
+
+
+
+Questions : est ce que pour iBGP il faut que chaque routeru interne à lAS ait une connection configuree neighbor avec le routeur de 
+bordure. 
+pour use loopback interface where applicable, est ce quil faut quand meme instaurer bgp sur les reseaux pour advertise? est ce quil 
+faut faire un lien entre tout les loopback puis entre loopback et pas loopback? et pour que le loopback soit privilégié est ce quil 
+faut que on utilise localpref.
