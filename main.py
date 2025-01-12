@@ -12,12 +12,19 @@ with open('intent.json', 'r') as file:
 
 directories = [d for d in local_path.iterdir() if d.is_dir()]
 
+def get_interface_name(interface_shortcut:str) -> str:
+    match(interface_shortcut):
+        case "g1/0" : return "gigabitethernet1/0"
+        case "g2/0" : return "gigabitethernet2/0"
+        case "g3/0" : return "gigabitethernet2/0"
+        case "f0/0" : return "fastethernet0/0"
+        case _ : return ""
+
 
 def get_router_num(content:str) -> int:
     for i, v in enumerate(list(content)): 
         if v == 'h':
             return int(list(content)[i+10])
-            
 def print_intro(router_number:int) -> str:
     return \
 """!
@@ -73,17 +80,8 @@ ip tcp synwait-time 5
 !
 !
 !""".format(str(router_number))
-
-def get_interface_name(interface_shortcut:str) -> str:
-    match(interface_shortcut):
-        case "g1/0" : return "gigabitethernet1/0"
-        case "g2/0" : return "gigabitethernet2/0"
-        case "g3/0" : return "gigabitethernet2/0"
-        case "f0/0" : return "fastethernet0/0"
-        case _ : return ""
-
-def print_ospf(router_nb:int, data: dict) -> str:
-    nb = str(router_nb)
+def print_ospf(router_number:int, data: dict) -> str:
+    nb = str(router_number)
     what_to_add = \
 """
 interface Loopback0
@@ -135,9 +133,9 @@ router ospf 1
 !""".format(nb, nb, nb, nb)
 
     return what_to_add
-
-
-def print_outro(router_name:int) -> str:
+def print_bgp(router_number:int, data:dict):
+    return ""
+def print_outro(router_number:int) -> str:
     return \
 """!
 ip forward-protocol nd
@@ -169,11 +167,8 @@ line vty 0 4
  login
 !
 !
-end""".format(*[str(router_name) for _ in range(4)])
+end""".format(*[str(router_number) for _ in range(4)])
 
-def print_bgp():
-    return
-print_ospf(1, data, "")
 
 for d in directories:
       dir = d / "configs/"
@@ -182,7 +177,12 @@ for d in directories:
             if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
                   with open(item, 'r') as file:
                         content = file.read()
-                        print(content)
-                        print(get_router_num(content))
+                        router_num = get_router_num(content)
+                        new_content = \
+                            print_intro(router_num) +\
+                            print_ospf(router_num, data) +\
+                            print_bgp(router_num, data) +\
+                            print_outro(router_num)
+                        print(new_content)
                         exit()
                         #file.write(new_content)
