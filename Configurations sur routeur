@@ -27,6 +27,9 @@ ajouter une interface dans OSPF : 1. configure terminal
                                   2. interface <nom_interface>
                                   3. ipv6 ospf <process-id> area <area-id>
 
+ajouter une interface passive dans OSPF : 1. configure terminal 
+                                          2. router ospf <nom_interface>
+                                          3. passive-interface <nom_interface>
 
 ajouter addresse de loopback : 1. configure terminal
                                2. interface Loopback0
