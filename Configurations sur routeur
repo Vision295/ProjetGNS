@@ -65,7 +65,16 @@ avec le routeur de gateway
 
 
 Questions : est ce que pour iBGP il faut que chaque routeru interne à lAS ait une connection configuree neighbor avec le routeur de 
-bordure. 
-pour use loopback interface where applicable, est ce quil faut quand meme instaurer bgp sur les reseaux pour advertise? est ce quil 
-faut faire un lien entre tout les loopback puis entre loopback et pas loopback? et pour que le loopback soit privilégié est ce quil 
-faut que on utilise localpref.
+bordure.
+Pour transmettres les routes en BGP. Pour qu'il puisse la transmettre et qu'ainsi que la Japon soit accessible.
+
+
+pour use loopback interface where applicable, est ce quil faut quand meme instaurer bgp sur les reseaux pour advertise?
+Il faut que les addresses de loopbacks soient uniques
+
+
+est ce quil faut faire un lien entre tout les loopback puis entre loopback et pas loopback?
+Il faut faire entre loopback pour que la session bgp fonctionne toujours
+par contre en ebgp il faut pas config avec loopback pour annoncer que le lien est down si il n'y a plus d'update()
+
+et pour que le loopback soit privilégié est ce quil faut que on utilise localpref.
