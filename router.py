@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-local_path = Path("C:/Users/theop/GNS3/projects/projetalinfini/project-files/dynamips")
 
 # List all directories in the given path
 class Router:
@@ -78,7 +77,7 @@ ip tcp synwait-time 5
 !
 !
 !
-!""".format(str(self.router_number))
+!""".format(str(self.router_num))
            
       def print_ospf_or_rip(self) -> str:
             if self.is_igp_ospf:
@@ -186,11 +185,11 @@ line vty 0 4
 end""".format(*[str(self.router_num) for _ in range(4)])
             return what_to_add
 
-      def __init__(self, content:str, data:str):
+      def __init__(self, content:str, data:dict):
             self.content = content
-            self.data = data
+            self.data:dict = data
             self.router_num:int = self.get_router_num()
-            self.is_igp_ospf:bool = self.router_num <= 7 
+            self.is_igp_ospf:bool = self.router_num <= 7 # todo : à changer 
             self.new_content = \
                   self.print_intro() +\
                   self.print_ospf_or_rip() +\
@@ -209,6 +208,7 @@ with open('intent.json', 'r') as file:
       data = json.load(file)
 
 
+local_path = Path("C:/Users/theop/GNS3/projects/projetalinfini/project-files/dynamips")
 directories = [d for d in local_path.iterdir() if d.is_dir()]
 
 
@@ -216,7 +216,6 @@ directories = [d for d in local_path.iterdir() if d.is_dir()]
 
 for d in directories:
       dir = d / "configs/"
-      print(dir)
       for item in dir.iterdir():
             if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
                 with open(item, 'r') as file:
@@ -225,6 +224,5 @@ for d in directories:
                           content=content,
                           data=data
                     )
-                    print(router.new_content)
                 with open(item, 'w') as file:
                     file.write(router.new_content)
