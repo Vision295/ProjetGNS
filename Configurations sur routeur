@@ -82,3 +82,13 @@ Il faut faire entre loopback pour que la session bgp fonctionne toujours
 par contre en ebgp il faut pas config avec loopback pour annoncer que le lien est down si il n'y a plus d'update()
 
 et pour que le loopback soit privilégié est ce quil faut que on utilise localpref.
+
+
+Choses a faire : 
+ 
+BGP : 1.update intentfile 
+      2.update router.py so that it works with new intent file 
+      3.setup bgp code for ibgp and ebgp
+      4.setup dark ospf
+
+extra: clean repository
