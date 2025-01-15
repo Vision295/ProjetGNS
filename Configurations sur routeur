@@ -53,6 +53,7 @@ pour configurer bgp sur un routeur: 1. configure terminal
 pour creer un lien bgp vers un routeur voisin : 1. configure terminal
                                                 2. router bgp <as_number>
                                                 3. neighbor <ipv6-address> remote-as <as-number>
+                                                3. (neighbor <ipv6address> update-source <interface>)
                                                 4. address-family ipv6 unicast
                                                 5. neighbor <ipv6-address> activate
 
