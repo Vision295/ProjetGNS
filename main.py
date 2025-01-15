@@ -22,9 +22,10 @@ def get_interface_name(interface_shortcut:str) -> str:
 
 
 def get_router_num(content:str) -> int:
-    for i, v in enumerate(list(content)): 
-        if v == 'h':
-            return int(list(content)[i+10])
+    list_content = list(content)
+    for i, v in enumerate(list_content): 
+        if v == 'h' and list_content[i+1] == 'o':
+            return int(list_content[i+10])
 def print_intro(router_number:int) -> str:
     return \
 """!
@@ -175,14 +176,14 @@ for d in directories:
       print(dir)
       for item in dir.iterdir():
             if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
-                  with open(item, 'r') as file:
-                        content = file.read()
-                        router_num = get_router_num(content)
-                        new_content = \
-                            print_intro(router_num) +\
-                            print_ospf(router_num, data) +\
-                            print_bgp(router_num, data) +\
-                            print_outro(router_num)
-                        print(new_content)
-                        exit()
-                        #file.write(new_content)
+                with open(item, 'r') as file:
+                    content = file.read()
+                    router_num = get_router_num(content)
+                    new_content = \
+                        print_intro(router_num) +\
+                        print_ospf(router_num, data) +\
+                        print_bgp(router_num, data) +\
+                        print_outro(router_num)
+                    print(new_content)
+                with open(item, 'w') as file:
+                    file.write(new_content)
