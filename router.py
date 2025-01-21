@@ -9,7 +9,6 @@ class Router:
       classe for creating a router
       """ 
       
-
       def get_router_num(self) -> int:
             """
             from the original "content" of the current config file gets the number of the router
@@ -203,26 +202,3 @@ end""".format(*[str(self.router_num) for _ in range(4)])
                   case "g3/0" : return "gigabitethernet2/0"
                   case "f0/0" : return "fastethernet0/0"
                   case _ : return ""
-
-with open('intent.json', 'r') as file:
-      data = json.load(file)
-
-
-local_path = Path("C:/Users/theop/GNS3/projects/projetalinfini/project-files/dynamips")
-directories = [d for d in local_path.iterdir() if d.is_dir()]
-
-
-
-
-for d in directories:
-      dir = d / "configs/"
-      for item in dir.iterdir():
-            if item.name.startswith("i") and item.name.endswith("_startup-config.cfg"):
-                with open(item, 'r') as file:
-                    content = file.read()
-                    router = Router(
-                          content=content,
-                          data=data
-                    )
-                with open(item, 'w') as file:
-                    file.write(router.new_content)
