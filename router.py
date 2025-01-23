@@ -137,6 +137,12 @@ interface GigabitEthernet3/0
  ipv6 address {}
 {}
 !""".format(self.data[text_igp[0]][nb]["g3/0"], text_igp[1])
+            if self.is_igp_ospf:
+                  what_to_add += \
+"""
+ipv6 router ospf 1
+ router-id {}.{}.{}.{}
+!""".format(nb, nb, nb, nb)
             return what_to_add
 
       def print_bgp(self) -> str:
@@ -157,11 +163,18 @@ router bgp {}
                         what_to_add += \
 """ neighbor {} remote-as {}
  neighbor {} update-source loopback0
- !""".format(
+""".format(
       Router.without_net_suffix(self.data[self.igp][key]["loopback"]),
       111 if self.is_igp_ospf else 222,
       Router.without_net_suffix(self.data[self.igp][key]["loopback"])
 )
+ 
+            if self.router_num in self.data["bgp"]:
+                  what_to_add += \
+""" neighbor {} remote-as {}
+neigh
+"""
+ 
             what_to_add += \
  """ !
  address-family ipv4
