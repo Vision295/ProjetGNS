@@ -2,8 +2,6 @@ import json
 from pathlib import Path
 
 
-print(get_network("1::1:1/127"))
-
 # List all directories in the given path
 class Router:
       
@@ -11,9 +9,9 @@ class Router:
       classe for creating a router
       """ 
       
-      without_net_suffix = lambda addr : "".join(list(addr[:-4]))
       get_igp = lambda self: "ospf" if self.is_igp_opsf else "rip"
       get_network = lambda addr: addr[:-5] + '0' + addr[-4:]
+      without_net_suffix = lambda addr : addr[:-4]
 
       def get_router_num(self) -> int:
             """
