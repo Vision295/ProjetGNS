@@ -153,8 +153,8 @@ router bgp {}
       *[self.router_num for _ in range(4)]
 )
             for key in self.data[self.igp].keys():
-                        if key != self.router_num:
-                              what_to_add += \
+                  if key != self.router_num:
+                        what_to_add += \
 """ neighbor {} remote-as {}
  neighbor {} update-source loopback0
  !""".format(
