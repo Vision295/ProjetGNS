@@ -9,7 +9,10 @@ with open('intent.json', 'r') as file:
 
 
 local_path = Path("C:/Users/theop/GNS3/projects/projetalinfini/project-files/dynamips")
-directories = [d for d in local_path.iterdir() if d.is_dir()]
+directories = []
+for d in local_path.iterdir():
+      if d.is_dir():
+            directories.append(d)
 
 
 
