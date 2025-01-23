@@ -238,7 +238,7 @@ line vty 0 4
  login
 !
 !
-end""".format(*[str(self.router_num) for _ in range(4)])
+end"""
             return what_to_add
 
       def __init__(self, content:str, data:dict):
