@@ -2,6 +2,12 @@ import json
 from pathlib import Path
 
 
+test = \
+""" ok
+ ok"""
+print(test, test)
+
+
 # List all directories in the given path
 class Router:
       
@@ -9,6 +15,9 @@ class Router:
       classe for creating a router
       """ 
       
+      without_net_suffix = lambda addr : "".join(list(addr[:-4]))
+      get_igp = lambda self: "ospf" if self.is_igp_opsf else "rip"
+
       def get_router_num(self) -> int:
             """
             from the original "content" of the current config file gets the number of the router
@@ -136,7 +145,33 @@ interface GigabitEthernet3/0
             return what_to_add
 
       def print_bgp(self) -> str:
-            return ""
+            self.igp = self.get_igp()
+            what_to_add = \
+"""
+!
+router bgp {}
+ bgp router-id {}.{}.{}.{}
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+""".format(
+      111 if self.is_igp_ospf else 222,
+      *[self.router_num for _ in range(4)]
+)
+            for key, _ in self.data[self.igp].items():
+                        if key != self.router_num:
+                              what_to_add += \
+""" neighbor {} remote-as {}
+ neighbor {} update-source loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !""".format(
+      Router.without_net_suffix(self.data[self.igp][key]["loopback"]),
+      111 if self.is_igp_opsf else 222,
+      Router.without_net_suffix(self.data[self.igp][key]["loopback"])
+)
+
+            return what_to_add
     
       def print_outro(self) -> str:
             nb = str(self.router_num)
