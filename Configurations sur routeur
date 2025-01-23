@@ -108,4 +108,6 @@ router bgp 65001
  -adressage automatique des addresses ipv6
  -[:-4] qui change en fonction de la taille du suffixe.
  -get router number qui ne marche pas que avec router number de 1 ou 2 chiffres
- -
+ -111 if self.is_igp_ospf else 222, faire en sorte d'ajouter modularité sur nom de l'AS
+ -ajouter routeurs et liens automatiquement 
+ 
