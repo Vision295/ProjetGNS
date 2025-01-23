@@ -140,7 +140,7 @@ interface GigabitEthernet3/0
             if self.is_igp_ospf:
                   what_to_add += \
 """
-ipv6 router ospf 1
+router ospf 1
  router-id {}.{}.{}.{}
 !""".format(nb, nb, nb, nb)
             return what_to_add
