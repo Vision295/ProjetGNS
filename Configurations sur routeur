@@ -92,3 +92,14 @@ BGP : 1.update intentfile
       4.setup dark ospf
 
 extra: clean repository
+
+ip prefix-list EBGP_ROUTES seq 5 permit 10.0.0.0/8
+ip prefix-list EBGP_ROUTES seq 10 permit 192.168.0.0/16
+
+route-map TAG_ROUTES permit 10
+ match ip address prefix-list EBGP_ROUTES
+ set community 65001:100
+
+router bgp 65001
+ neighbor 203.0.113.1 remote-as 65002
+ neighbor 203.0.113.1 route-map TAG_ROUTES in
