@@ -158,12 +158,26 @@ interface GigabitEthernet3/0
  ipv6 address {}
 !""".format(self.data["bgp"][nb]["g3/0"])
 
+
+            print("is_igp_ospf : ", self.is_igp_ospf)
+            print("router num : ", self.router_num)
+            print("router_num in self.data['bgp']", str(self.router_num) in self.data["bgp"] )
             if self.is_igp_ospf:
                   what_to_add += \
 """
 router ospf 1
- router-id {}.{}.{}.{}
-!""".format(nb, nb, nb, nb)
+ router-id {}.{}.{}.{}""".format(nb, nb, nb, nb)
+
+            if str(self.router_num) in self.data["bgp"] and self.is_igp_ospf:
+                  for key in self.data["bgp"][str(self.router_num)].keys():
+                        what_to_add += \
+""" 
+ passive-interface {}""".format(self.get_interface_name(key))
+
+            if self.is_igp_ospf:
+                  what_to_add += \
+"""
+!"""
             return what_to_add
 
       def print_bgp(self) -> str:
@@ -220,8 +234,15 @@ router bgp {}
                         what_to_add += "  neighbor {} activate\n".format(Router.without_net_suffix(value["loopback"]))
                   
             # if the router is border router than it has info in the "bgp" section of the intent file
-            if self.router_num in self.data["bgp"]:
-                  what_to_add += "  neighbor {} activate\n".format(self.without_net_suffix(self.data["bgp"][str(self.router_num)]))
+            match self.router_num:
+                  case 6: 
+                        what_to_add += "  neighbor 3::1:2 activate\n"
+                  case 16:
+                        what_to_add += "  neighbor 3::1:1 activate\n"
+                  case 7: 
+                        what_to_add += "  neighbor 3::2:2 activate\n"
+                  case 17: 
+                        what_to_add += "  neighbor 3::2:1 activate\n"
 
             what_to_add += " exit-address-family\n!\n"
             return what_to_add
@@ -285,8 +306,8 @@ end"""
           
       def get_interface_name(self, interface_shortcut:str) -> str:
             match(interface_shortcut):
-                  case "g1/0" : return "gigabitethernet1/0"
-                  case "g2/0" : return "gigabitethernet2/0"
-                  case "g3/0" : return "gigabitethernet2/0"
-                  case "f0/0" : return "fastethernet0/0"
+                  case "g1/0" : return "Gigabitethernet1/0"
+                  case "g2/0" : return "Gigabitethernet2/0"
+                  case "g3/0" : return "Gigabitethernet2/0"
+                  case "f0/0" : return "Fastethernet0/0"
                   case _ : return ""
