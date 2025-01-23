@@ -2,8 +2,6 @@ import json
 from pathlib import Path
 
 
-print(get_network("1::1:1/127"))
-
 # List all directories in the given path
 class Router:
       
@@ -11,9 +9,9 @@ class Router:
       classe for creating a router
       """ 
       
-      without_net_suffix = lambda addr : "".join(list(addr[:-4]))
       get_igp = lambda self: "ospf" if self.is_igp_opsf else "rip"
       get_network = lambda addr: addr[:-5] + '0' + addr[-4:]
+      without_net_suffix = lambda addr : addr[:-4]
 
       def get_router_num(self) -> int:
             """
@@ -159,21 +157,41 @@ router bgp {}
                               what_to_add += \
 """ neighbor {} remote-as {}
  neighbor {} update-source loopback0
- !
+ !""".format(
+      Router.without_net_suffix(self.data[self.igp][key]["loopback"]),
+      111 if self.is_igp_ospf else 222,
+      Router.without_net_suffix(self.data[self.igp][key]["loopback"])
+)
+            what_to_add += \
+ """ !
  address-family ipv4
  exit-address-family
  !
- address-family ipv6""".format(
-      Router.without_net_suffix(self.data[self.igp][key]["loopback"]),
-      111 if self.is_igp_opsf else 222,
-      Router.without_net_suffix(self.data[self.igp][key]["loopback"])
-)
+ address-family ipv6summary_
+"""           
+
+            # get the ip networks from igp
+
             for key, value in self.data[self.igp][self.router_num].items():
                  if key != "loopback":
-                       what_to_add += \
-""" 
+                       what_to_add += "  network {}\n".format(Router.get_network(value))
 
-""" 
+            # get the ip networks from bgp
+            for key, value in self.data["bgp"][self.router_num].items():
+                 if key != "loopback":
+                       what_to_add += "  network {}\n".format(Router.get_network(value))
+                       
+                       
+            # get the ip address of neighbors in igp
+            for key, value in self.data[self.igp].items():
+                  if key != self.router_num:
+                        what_to_add += "  neighbor {} activate\n".format(self.without_net_suffix(value["loopback"]))
+                  
+            # if the router is border router than it has info in the "bgp" section of the intent file
+            if self.router_num in self.data["bgp"]:
+                  what_to_add += "  neighbor {} activate\n".format(self.without_net_suffix(self.data["bgp"][self.router_num]))
+
+            what_to_add += " exit-address-family\n!\n"
 
             return what_to_add
     
@@ -220,7 +238,7 @@ line vty 0 4
  login
 !
 !
-end""".format(*[str(self.router_num) for _ in range(4)])
+end"""
             return what_to_add
 
       def __init__(self, content:str, data:dict):
