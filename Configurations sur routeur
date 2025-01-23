@@ -103,3 +103,9 @@ route-map TAG_ROUTES permit 10
 router bgp 65001
  neighbor 203.0.113.1 remote-as 65002
  neighbor 203.0.113.1 route-map TAG_ROUTES in
+
+ Choses que l'on peut améliorer pour que ce soit modulable: 
+ -adressage automatique des addresses ipv6
+ -[:-4] qui change en fonction de la taille du suffixe.
+ -get router number qui ne marche pas que avec router number de 1 ou 2 chiffres
+ -
