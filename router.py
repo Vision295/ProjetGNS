@@ -158,10 +158,11 @@ interface GigabitEthernet3/0
  ipv6 address {}
 !""".format(self.data["bgp"][nb]["g3/0"])
 
-
+            """
             print("is_igp_ospf : ", self.is_igp_ospf)
             print("router num : ", self.router_num)
             print("router_num in self.data['bgp']", str(self.router_num) in self.data["bgp"] )
+            """
             if self.is_igp_ospf:
                   what_to_add += \
 """
@@ -204,10 +205,16 @@ router bgp {}
       Router.without_net_suffix(self.data[self.igp][key]["loopback"])
 )
  
-            if self.router_num in self.data["bgp"]:
-                  tempAsNum = "111" if self.router_num < 10 else "222"
-                  what_to_add += \
-"""  neighbor {} remote-as {}\n !""".format(self.data["bgp"][self.router_num], tempAsNum)
+            # if the router is border router than it has info in the "bgp" section of the intent file
+            match self.router_num:
+                  case 6: 
+                        what_to_add += "  neighbor 3::1:2 remote-as 222\n"
+                  case 16:
+                        what_to_add += "  neighbor 3::1:1 remote-as 111\n"
+                  case 7: 
+                        what_to_add += "  neighbor 3::2:2 remote-as 222\n"
+                  case 17: 
+                        what_to_add += "  neighbor 3::2:1 remote-as 111\n"
  
             what_to_add += \
  """ !
