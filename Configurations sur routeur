@@ -110,4 +110,4 @@ router bgp 65001
  -get router number qui ne marche pas que avec router number de 1 ou 2 chiffres
  -111 if self.is_igp_ospf else 222, faire en sorte d'ajouter modularité sur nom de l'AS
  -ajouter routeurs et liens automatiquement 
- 
+ -pk est ce que success rate pas 100/100, est ce que a cause de RIP?
