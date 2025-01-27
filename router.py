@@ -1,5 +1,6 @@
-import json
 from pathlib import Path
+from utils import *
+
 
 
 # List all directories in the given path
@@ -9,11 +10,8 @@ class Router:
       classe for creating a router
       """ 
       
-      get_igp = lambda self: "ospf" if self.is_igp_ospf else "rip"
-      get_network = lambda addr: addr[:-5] + '0' + addr[-4:]
-      without_net_suffix = lambda addr : addr[:-4]
 
-      def get_router_num(self) -> int:
+      def get_router_num(self):
             """
             from the original "content" of the current config file gets the number of the router
             no input -> returns int
@@ -22,12 +20,12 @@ class Router:
             for i, v in enumerate(list_content): 
                   if v == 'h' and list_content[i+1] == 'o':
                         if list_content[i+11] in "1234567890":
-                              return int(list_content[i+10] + list_content[i+11])
+                              self.router_num = int(list_content[i+10] + list_content[i+11])
                         else:
-                              return int(list_content[i+10])
+                              self.router_num = int(list_content[i+10])
            
-      def print_intro(self) -> str:
-          return \
+      def print_intro(self):
+          self.new_content += \
 """!
 !
 !
@@ -82,7 +80,7 @@ ip tcp synwait-time 5
 !
 !""".format(str(self.router_num))
            
-      def print_ospf_or_rip(self) -> str:
+      def print_ospf_or_rip(self):
             if self.is_igp_ospf:
                   text_igp = [
                         "ospf",
@@ -94,7 +92,7 @@ ip tcp synwait-time 5
                         "ipv6 rip 1 enable"
                         ]
             nb = str(self.router_num)
-            what_to_add = \
+            self.new_content += \
 """
 interface Loopback0
  no ip address
@@ -102,7 +100,7 @@ interface Loopback0
  {}
 !""".format(self.data[text_igp[0]][nb]["loopback"], text_igp[1])
             if "f0/0" in self.data[text_igp[0]][nb]:
-                  what_to_add += \
+                  self.new_content += \
 """
 interface FastEthernet0/0
  no ip address
@@ -111,7 +109,7 @@ interface FastEthernet0/0
  {}
 !""".format(self.data[text_igp[0]][nb]["f0/0"], text_igp[1])
             if "g1/0" in self.data[text_igp[0]][nb]:
-                  what_to_add += \
+                  self.new_content += \
 """
 interface GigabitEthernet1/0
  no ip address
@@ -120,7 +118,7 @@ interface GigabitEthernet1/0
  {}
 !""".format(self.data[text_igp[0]][nb]["g1/0"], text_igp[1])
             if "g2/0" in self.data[text_igp[0]][nb]:
-                  what_to_add += \
+                  self.new_content += \
 """
 interface GigabitEthernet2/0
  no ip address
@@ -129,7 +127,7 @@ interface GigabitEthernet2/0
  {}
 !""".format(self.data[text_igp[0]][nb]["g2/0"], text_igp[1])
             if "g3/0" in self.data[text_igp[0]][nb]:
-                  what_to_add += \
+                  self.new_content += \
 """
 interface GigabitEthernet3/0
  no ip address
@@ -140,7 +138,7 @@ interface GigabitEthernet3/0
 
             if nb in self.data["bgp"]: 
                   if "g1/0" in self.data["bgp"][nb]:
-                        what_to_add += \
+                        self.new_content += \
 """
 interface GigabitEthernet1/0
  no ip address
@@ -150,7 +148,7 @@ interface GigabitEthernet1/0
 
             if nb in self.data["bgp"]:
                   if "g3/0" in self.data["bgp"]:
-                        what_to_add += \
+                        self.new_content += \
 """
 interface GigabitEthernet3/0
  no ip address
@@ -164,26 +162,26 @@ interface GigabitEthernet3/0
             print("router_num in self.data['bgp']", str(self.router_num) in self.data["bgp"] )
             """
             if self.is_igp_ospf:
-                  what_to_add += \
+                  self.new_content += \
 """
 router ospf 1
  router-id {}.{}.{}.{}""".format(nb, nb, nb, nb)
 
             if str(self.router_num) in self.data["bgp"] and self.is_igp_ospf:
                   for key in self.data["bgp"][str(self.router_num)].keys():
-                        what_to_add += \
+                        self.new_content += \
 """ 
- passive-interface {}""".format(self.get_interface_name(key))
+ passive-interface {}""".format(Router.get_interface_name(key))
 
             if self.is_igp_ospf:
-                  what_to_add += \
+                  self.new_content += \
 """
 !"""
-            return what_to_add
+            return self.new_content
 
-      def print_bgp(self) -> str:
+      def print_bgp(self):
             self.igp = self.get_igp()
-            what_to_add = \
+            self.new_content += \
 """
 !
 router bgp {}
@@ -196,7 +194,7 @@ router bgp {}
 )
             for key in self.data[self.igp].keys():
                   if key != self.router_num:
-                        what_to_add += \
+                        self.new_content += \
 """ neighbor {} remote-as {}
  neighbor {} update-source loopback0
 """.format(
@@ -208,15 +206,15 @@ router bgp {}
             # if the router is border router than it has info in the "bgp" section of the intent file
             match self.router_num:
                   case 6: 
-                        what_to_add += "  neighbor 3::1:2 remote-as 222\n"
+                        self.new_content += "  neighbor 3::1:2 remote-as 222\n"
                   case 16:
-                        what_to_add += "  neighbor 3::1:1 remote-as 111\n"
+                        self.new_content += "  neighbor 3::1:1 remote-as 111\n"
                   case 7: 
-                        what_to_add += "  neighbor 3::2:2 remote-as 222\n"
+                        self.new_content += "  neighbor 3::2:2 remote-as 222\n"
                   case 17: 
-                        what_to_add += "  neighbor 3::2:1 remote-as 111\n"
+                        self.new_content += "  neighbor 3::2:1 remote-as 111\n"
  
-            what_to_add += \
+            self.new_content += \
  """ !
  address-family ipv4
   exit-address-family
@@ -227,36 +225,36 @@ router bgp {}
 
             for key, value in self.data[self.igp][str(self.router_num)].items():
                  if key != "loopback":
-                       what_to_add += "  network {}\n".format(Router.get_network(value))
+                       self.new_content += "  network {}\n".format(Router.get_network(value))
 
             # get the ip networks from bgp
             if str(self.router_num) in self.data["bgp"]:
                   for value in self.data["bgp"][str(self.router_num)].values():
-                       what_to_add += "  network {}\n".format(Router.get_network(value))
+                       self.new_content += "  network {}\n".format(Router.get_network(value))
                        
                        
             # get the ip address of neighbors in igp
             for key, value in self.data[self.igp].items():
                   if key != str(self.router_num):
-                        what_to_add += "  neighbor {} activate\n".format(Router.without_net_suffix(value["loopback"]))
+                        self.new_content += "  neighbor {} activate\n".format(Router.without_net_suffix(value["loopback"]))
                   
             # if the router is border router than it has info in the "bgp" section of the intent file
             match self.router_num:
                   case 6: 
-                        what_to_add += "  neighbor 3::1:2 activate\n"
+                        self.new_content += "  neighbor 3::1:2 activate\n"
                   case 16:
-                        what_to_add += "  neighbor 3::1:1 activate\n"
+                        self.new_content += "  neighbor 3::1:1 activate\n"
                   case 7: 
-                        what_to_add += "  neighbor 3::2:2 activate\n"
+                        self.new_content += "  neighbor 3::2:2 activate\n"
                   case 17: 
-                        what_to_add += "  neighbor 3::2:1 activate\n"
+                        self.new_content += "  neighbor 3::2:1 activate\n"
 
-            what_to_add += " exit-address-family\n!\n"
-            return what_to_add
+            self.new_content += " exit-address-family\n!\n"
+            return self.new_content
     
-      def print_outro(self) -> str:
+      def print_outro(self):
             nb = str(self.router_num)
-            what_to_add = \
+            self.new_content += \
 """!
 ip forward-protocol nd
 !
@@ -265,18 +263,18 @@ no ip http server
 no ip http secure-server
 !"""
             if self.is_igp_ospf:
-                  what_to_add += \
+                  self.new_content += \
 """
 ipv6 router ospf 1
  router-id {}.{}.{}.{}
 !""".format(nb, nb, nb, nb)
             else:
-                  what_to_add += \
+                  self.new_content += \
 """
 ipv6 router rip 1
  redistribute connected
 !"""
-            what_to_add += \
+            self.new_content += \
 """
 !
 !
@@ -298,24 +296,17 @@ line vty 0 4
 !
 !
 end"""
-            return what_to_add
+            return self.new_content
 
       def __init__(self, content:str, data:dict):
             self.content = content
             self.data:dict = data
-            self.router_num:int = self.get_router_num()
+            self.get_router_num()
             self.is_igp_ospf:bool = self.router_num <= 7 # todo : à changer 
-            self.new_content = \
-                  self.print_intro() +\
-                  self.print_ospf_or_rip() +\
-                  self.print_bgp() +\
-                  self.print_outro() 
+            self.new_content = ""
+            self.print_intro() 
+            self.print_ospf_or_rip() 
+            self.print_bgp() 
+            self.print_outro() 
             print(self.new_content)
           
-      def get_interface_name(self, interface_shortcut:str) -> str:
-            match(interface_shortcut):
-                  case "g1/0" : return "Gigabitethernet1/0"
-                  case "g2/0" : return "Gigabitethernet2/0"
-                  case "g3/0" : return "Gigabitethernet2/0"
-                  case "f0/0" : return "Fastethernet0/0"
-                  case _ : return ""
