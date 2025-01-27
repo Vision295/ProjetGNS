@@ -296,7 +296,7 @@ end"""
             self.content = content
             self.data:dict = data
             self.get_router_num()
-            self.nb = self.nb
+            self.nb = str(self.router_num)
             self.is_igp_ospf:bool = self.router_num <= 7 # todo : à changer 
             self.new_content = ""
             self.print_intro() 
