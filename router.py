@@ -26,7 +26,8 @@ class Router:
                               self.router_num = int(list_content[i+10])
            
       def print_intro(self):
-          self.new_content += \
+            
+            self.new_content += \
 """!
 !
 !
