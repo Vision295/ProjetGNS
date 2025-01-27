@@ -219,7 +219,7 @@ router bgp {}
             what_to_add += \
  """ !
  address-family ipv4
- exit-address-family
+  exit-address-family
  !
  address-family ipv6
 """           
@@ -310,6 +310,7 @@ end"""
                   self.print_ospf_or_rip() +\
                   self.print_bgp() +\
                   self.print_outro() 
+            print(self.new_content)
           
       def get_interface_name(self, interface_shortcut:str) -> str:
             match(interface_shortcut):
