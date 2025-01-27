@@ -1,7 +1,6 @@
 
 
 
-get_igp = lambda self: "ospf" if self.is_igp_ospf else "rip"
 get_network = lambda addr: addr[:-5] + '0' + addr[-4:]
 without_net_suffix = lambda addr : addr[:-4]
 

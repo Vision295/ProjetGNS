@@ -10,6 +10,7 @@ class Router:
       classe for creating a router
       """ 
       
+      get_igp = lambda self: "ospf" if self.is_igp_ospf else "rip"
 
       def get_router_num(self):
             """
@@ -78,7 +79,7 @@ ip tcp synwait-time 5
 !
 !
 !
-!""".format(str(self.router_num))
+!""".format(self.nb)
            
       def print_ospf_or_rip(self):
             if self.is_igp_ospf:
@@ -91,15 +92,14 @@ ip tcp synwait-time 5
                         "rip",
                         "ipv6 rip 1 enable"
                         ]
-            nb = str(self.router_num)
             self.new_content += \
 """
 interface Loopback0
  no ip address
  ipv6 address {}
  {}
-!""".format(self.data[text_igp[0]][nb]["loopback"], text_igp[1])
-            if "f0/0" in self.data[text_igp[0]][nb]:
+!""".format(self.data[text_igp[0]][self.nb]["loopback"], text_igp[1])
+            if "f0/0" in self.data[text_igp[0]][self.nb]:
                   self.new_content += \
 """
 interface FastEthernet0/0
@@ -107,8 +107,8 @@ interface FastEthernet0/0
  duplex full
  ipv6 address {}
  {}
-!""".format(self.data[text_igp[0]][nb]["f0/0"], text_igp[1])
-            if "g1/0" in self.data[text_igp[0]][nb]:
+!""".format(self.data[text_igp[0]][self.nb]["f0/0"], text_igp[1])
+            if "g1/0" in self.data[text_igp[0]][self.nb]:
                   self.new_content += \
 """
 interface GigabitEthernet1/0
@@ -116,8 +116,8 @@ interface GigabitEthernet1/0
  negotiation auto
  ipv6 address {}
  {}
-!""".format(self.data[text_igp[0]][nb]["g1/0"], text_igp[1])
-            if "g2/0" in self.data[text_igp[0]][nb]:
+!""".format(self.data[text_igp[0]][self.nb]["g1/0"], text_igp[1])
+            if "g2/0" in self.data[text_igp[0]][self.nb]:
                   self.new_content += \
 """
 interface GigabitEthernet2/0
@@ -125,28 +125,28 @@ interface GigabitEthernet2/0
  negotiation auto
  ipv6 address {}
  {}
-!""".format(self.data[text_igp[0]][nb]["g2/0"], text_igp[1])
-            if "g3/0" in self.data[text_igp[0]][nb]:
+!""".format(self.data[text_igp[0]][self.nb]["g2/0"], text_igp[1])
+            if "g3/0" in self.data[text_igp[0]][self.nb]:
                   self.new_content += \
 """
 interface GigabitEthernet3/0
  no ip address
  negotiation auto
  ipv6 address {}
-!""".format(self.data[text_igp[0]][nb]["g3/0"], text_igp[1])
+!""".format(self.data[text_igp[0]][self.nb]["g3/0"], text_igp[1])
 
 
-            if nb in self.data["bgp"]: 
-                  if "g1/0" in self.data["bgp"][nb]:
+            if self.nb in self.data["bgp"]: 
+                  if "g1/0" in self.data["bgp"][self.nb]:
                         self.new_content += \
 """
 interface GigabitEthernet1/0
  no ip address
  negotiation auto
  ipv6 address {}
-!""".format(self.data["bgp"][nb]["g1/0"])
+!""".format(self.data["bgp"][self.nb]["g1/0"])
 
-            if nb in self.data["bgp"]:
+            if self.nb in self.data["bgp"]:
                   if "g3/0" in self.data["bgp"]:
                         self.new_content += \
 """
@@ -154,24 +154,19 @@ interface GigabitEthernet3/0
  no ip address
  negotiation auto
  ipv6 address {}
-!""".format(self.data["bgp"][nb]["g3/0"])
+!""".format(self.data["bgp"][self.nb]["g3/0"])
 
-            """
-            print("is_igp_ospf : ", self.is_igp_ospf)
-            print("router num : ", self.router_num)
-            print("router_num in self.data['bgp']", str(self.router_num) in self.data["bgp"] )
-            """
             if self.is_igp_ospf:
                   self.new_content += \
 """
 router ospf 1
- router-id {}.{}.{}.{}""".format(nb, nb, nb, nb)
+ router-id {}.{}.{}.{}""".format(self.nb, self.nb, self.nb, self.nb)
 
-            if str(self.router_num) in self.data["bgp"] and self.is_igp_ospf:
-                  for key in self.data["bgp"][str(self.router_num)].keys():
+            if self.nb in self.data["bgp"] and self.is_igp_ospf:
+                  for key in self.data["bgp"][self.nb].keys():
                         self.new_content += \
 """ 
- passive-interface {}""".format(Router.get_interface_name(key))
+ passive-interface {}""".format(get_interface_name(key))
 
             if self.is_igp_ospf:
                   self.new_content += \
@@ -198,9 +193,9 @@ router bgp {}
 """ neighbor {} remote-as {}
  neighbor {} update-source loopback0
 """.format(
-      Router.without_net_suffix(self.data[self.igp][key]["loopback"]),
+      without_net_suffix(self.data[self.igp][key]["loopback"]),
       111 if self.is_igp_ospf else 222,
-      Router.without_net_suffix(self.data[self.igp][key]["loopback"])
+      without_net_suffix(self.data[self.igp][key]["loopback"])
 )
  
             # if the router is border router than it has info in the "bgp" section of the intent file
@@ -223,20 +218,20 @@ router bgp {}
 """           
             # get the ip networks from igp
 
-            for key, value in self.data[self.igp][str(self.router_num)].items():
+            for key, value in self.data[self.igp][self.nb].items():
                  if key != "loopback":
-                       self.new_content += "  network {}\n".format(Router.get_network(value))
+                       self.new_content += "  network {}\n".format(get_network(value))
 
             # get the ip networks from bgp
-            if str(self.router_num) in self.data["bgp"]:
-                  for value in self.data["bgp"][str(self.router_num)].values():
-                       self.new_content += "  network {}\n".format(Router.get_network(value))
+            if self.nb in self.data["bgp"]:
+                  for value in self.data["bgp"][self.nb].values():
+                       self.new_content += "  network {}\n".format(get_network(value))
                        
                        
             # get the ip address of neighbors in igp
             for key, value in self.data[self.igp].items():
-                  if key != str(self.router_num):
-                        self.new_content += "  neighbor {} activate\n".format(Router.without_net_suffix(value["loopback"]))
+                  if key != self.nb:
+                        self.new_content += "  neighbor {} activate\n".format(without_net_suffix(value["loopback"]))
                   
             # if the router is border router than it has info in the "bgp" section of the intent file
             match self.router_num:
@@ -253,7 +248,6 @@ router bgp {}
             return self.new_content
     
       def print_outro(self):
-            nb = str(self.router_num)
             self.new_content += \
 """!
 ip forward-protocol nd
@@ -267,7 +261,7 @@ no ip http secure-server
 """
 ipv6 router ospf 1
  router-id {}.{}.{}.{}
-!""".format(nb, nb, nb, nb)
+!""".format(self.nb, self.nb, self.nb, self.nb)
             else:
                   self.new_content += \
 """
@@ -302,6 +296,7 @@ end"""
             self.content = content
             self.data:dict = data
             self.get_router_num()
+            self.nb = self.nb
             self.is_igp_ospf:bool = self.router_num <= 7 # todo : à changer 
             self.new_content = ""
             self.print_intro() 
