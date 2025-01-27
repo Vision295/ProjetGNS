@@ -14,16 +14,24 @@ class Router:
 
       def get_router_num(self):
             """
-            from the original "content" of the current config file gets the number of the router
-            no input -> returns int
+            From the original "content" of the current config file, get the number of the router.
+            No input -> returns int.
             """
             list_content = list(self.content)
             for i, v in enumerate(list_content): 
                   if v == 'h' and list_content[i+1] == 'o':
-                        if list_content[i+11] in "1234567890":
-                              self.router_num = int(list_content[i+10] + list_content[i+11])
-                        else:
-                              self.router_num = int(list_content[i+10])
+            # Start collecting digits starting from i+2, which is the first digit after 'ho'
+                        num_str = ''
+            # Collect digits until a non-digit character is found
+                        j = i + 10
+                        while j < len(list_content) and list_content[j].isdigit():
+                              num_str += list_content[j]
+                              j += 1
+                              print(num_str)
+            # If a number is found, convert to int and store
+                        if num_str:
+                              self.router_num = int(num_str)
+                              
            
       def print_intro(self):
             
