@@ -2,6 +2,7 @@ import copy
 import ipaddress
 import json
 from itertools import islice
+from utils import interfaces
 
 ##### GIVEN THE FOLLOWING EXAMPLE
  
@@ -35,6 +36,9 @@ class IntentGen():
             self.get_networks()
             self.get_connections()
             self.get_new_intent()
+            print("networks : ", self.networks)
+            print("connections : ", self.connections)
+            print("new_intent : ", self.new_intent)
       
       def get_networks(self):
             self.networks = {}
@@ -52,16 +56,18 @@ class IntentGen():
 
       def get_connections(self):
             self.connections = {}
+            
             for index, value in self.networks.items():
+                  net = ipaddress.ip_network(value)
                   if index[0] in self.connections.keys():
-                        self.connections[index[0]].append((ipaddress.ip_interface(value) + 1).compressed)    
+                        self.connections[index[0]].append(ipaddress.ip_interface(f"{net.network_address + 1}/{net.prefixlen}").compressed)    
                   else:
-                        self.connections[index[0]] = [(ipaddress.ip_interface(value) + 1).compressed]
+                        self.connections[index[0]] = [ipaddress.ip_interface(f"{net.network_address + 1}/{net.prefixlen}").compressed]
                   
                   if index[1] in self.connections.keys():
-                        self.connections[index[1]].append((ipaddress.ip_interface(value) + 2).compressed)
+                        self.connections[index[1]].append(ipaddress.ip_interface(f"{net.network_address + 2}/{net.prefixlen}").compressed)    
                   else:
-                        self.connections[index[1]] = [(ipaddress.ip_interface(value) + 2).compressed]
+                        self.connections[index[1]] = [ipaddress.ip_interface(f"{net.network_address + 2}/{net.prefixlen}").compressed]   
 
 
             for values in self.connections.values():
@@ -73,7 +79,6 @@ class IntentGen():
             self.new_intent = {}
             self.what_to_add = {}            
 
-            interfaces = ["f0/0", "g1/0", "g2/0", "g3/0"]
 
             for key, value in self.connections.items():
                   self.what_to_add[str(key)] = {interfaces[i]: v for i, v in enumerate(value)}
