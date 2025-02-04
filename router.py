@@ -1,6 +1,7 @@
 from pathlib import Path
 from utils import *
 from template import *
+from intentGen import IntentGen
 
 
 
@@ -131,9 +132,9 @@ class Router:
 
             self.new_content += OUTRO_OF_OUTRO
 
-      def __init__(self, input:str, extended_intent:dict):
+      def __init__(self, input:str, new_intent:IntentGen):
             self.content = input
-            self.data = extended_intent["AS"]
+            self.data = new_intent.new_content["AS"]
             self.new_content = ""
 
             self.get_router_num()

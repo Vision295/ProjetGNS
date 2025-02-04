@@ -57,7 +57,6 @@ class IntentGen():
                               if not key in self.networks.keys() and not key in self.networks.keys() and key[0] != key[1]:
                                     self.networks[key] = self.subnets[nb_subnet_taken].compressed
                                     nb_subnet_taken += 1
-                                    
 
       def get_connections(self):
             self.connections = {}
@@ -78,8 +77,6 @@ class IntentGen():
             for values in self.connections.values():
                   if len(values) > 4:
                         print("Router cannot have more than 4 connections !")
-                        
-            
             
       def get_new_intent(self):
             self.new_intent = {}

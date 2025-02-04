@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from router import Router
+from intentGen import IntentGen
 
 
 
@@ -17,6 +18,7 @@ for d in local_path.iterdir():
 
 
 
+new_intent = IntentGen(data)
 
 for d in directories:
       dir = d / "configs/"
@@ -26,7 +28,7 @@ for d in directories:
                     content = file.read()
                     router = Router(
                           input=content,
-                          extended_intent=data
+                          new_intent=new_intent
                     )
                     print("printed on file ", file.name[-22:])
                 with open(item, 'w') as file:
