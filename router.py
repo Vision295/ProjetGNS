@@ -64,6 +64,7 @@ class Router:
 
 
             # j'en suis là
+            # c'est la mort ici
             for elem in get_border_router_ips(self.data):
                   if self.nb in elem:
                         self.new_content += "\n passive-interface {}".format(get_interface_name(elem[1]))
@@ -73,18 +74,17 @@ class Router:
             return self.new_content
 
       def print_bgp(self):
-            self.igp = self.get_igp()
             self.new_content += BGP_INTRO.format(
-                  111 if self.is_igp_ospf else 222,
+                  self.asn,
                   *[self.router_num for _ in range(4)]
             )
 
-            for key in self.data[self.asn][self.igp].keys():
+            for key in self.data[self.asn]["routers"].keys():
                   if key != self.router_num:
                         self.new_content += BGP_NEIGHBOR.format(
-                              without_net_suffix(self.data[self.asn][self.igp][key]["loopback"]),
-                              111 if self.is_igp_ospf else 222,
-                              without_net_suffix(self.data[self.asn][self.igp][key]["loopback"])
+                              without_net_suffix(self.data[self.asn]["routers"][key]["loopback"]),
+                              self.asn,
+                              without_net_suffix(self.data[self.asn]["routers"][key]["loopback"])
                         )
 
             self.ebgp_neighbors = get_border_router_ips(self.data[self.asn])
