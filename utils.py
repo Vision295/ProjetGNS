@@ -43,20 +43,24 @@ def get_border_router(intent: dict) -> list[str]:
 
 def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
     border_routers = []
-    as_data = intent["AS"]
+    as_data = intent["AS"]  # Récupération des données des AS
     
+    # Parcours de chaque AS
     for asn, as_info in as_data.items():
-        for router_id, interfaces in as_info["routers"].items():
-            for iface, ip in interfaces.items():
-                current_network = ipaddress.ip_interface(ip).network
+        for router_id, interfaces in as_info["routers"].items():  # Parcours des routeurs de l'AS
+            for iface, ip in interfaces.items():  # Parcours des interfaces et de leurs IPs
+                ip_network = ipaddress.ip_network(ip, strict=False)  # Conversion en réseau
                 
+                # Vérification si l'IP est dans un autre AS
                 for other_asn, other_as_info in as_data.items():
-                    if other_asn != asn:
+                    if other_asn != asn:  # Éviter la comparaison avec soi-même
                         for other_router, other_interfaces in other_as_info["routers"].items():
                             for other_ip in other_interfaces.values():
-                                other_network = ipaddress.ip_interface(other_ip).network
-                                if current_network.network_address == other_network.network_address:
-                                    border_routers.append((ip.split('/')[0], other_asn))
+                                other_ip_network = ipaddress.ip_network(other_ip, strict=False)
+                                if ip_network.compare_networks(other_ip_network) == 0:  # Comparaison des réseaux
+                                    border_routers.append((ipaddress.ip_interface(ip).compressed, other_asn))  # Ajout à la liste
+    
+    return border_routers  # Retourne la liste des routeurs frontières
     
     return border_routers
 
