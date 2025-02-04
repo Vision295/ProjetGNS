@@ -46,13 +46,20 @@ class IntentGen():
             self.subnets = list(islice(self.ipRange.subnets(new_prefix=PREFIX), 0, nb_subnets))
       
             nb_subnet_taken = 0
-            for index, value in enumerate(self.alpha):
-                  for i, v in enumerate(self.beta[self.alpha[index-1]:value+1]):
-                        key = (index, v)
-                             
-                        if not key in self.networks.keys() and not key in self.networks.keys() and key[0] != key[1]:
-                              self.networks[key] = self.subnets[nb_subnet_taken].compressed
-                              nb_subnet_taken += 1
+            self.alpha.append(len(self.beta))
+            
+
+            for index, value in enumerate(self.alpha[0:-1]):
+                  if self.alpha[index] != self.alpha[index + 1] and self.alpha[index] < self.alpha[-1]:
+                        for i, v in enumerate(self.beta[value:self.alpha[index+1]]):
+                              key = (index, v)
+                                   
+                              if not key in self.networks.keys() and not key in self.networks.keys() and key[0] != key[1]:
+                                    self.networks[key] = self.subnets[nb_subnet_taken].compressed
+                                    nb_subnet_taken += 1
+                                    
+                                    
+            print(self.networks)
 
       def get_connections(self):
             self.connections = {}
@@ -73,6 +80,9 @@ class IntentGen():
             for values in self.connections.values():
                   if len(values) > 4:
                         print("Router cannot have more than 4 connections !")
+                        
+                        
+            print(self.connections)
             
             
       def get_new_intent(self):
@@ -82,6 +92,7 @@ class IntentGen():
 
             for key, value in self.connections.items():
                   self.what_to_add[str(key)] = {interfaces[i]: v for i, v in enumerate(value)}
+                  self.what_to_add[str(key)]["loopback"] = f"1::{key}/128"
                   
             self.new_intent = copy.deepcopy(self.data)
             for key, value in self.data['AS'].items():
@@ -94,3 +105,8 @@ class IntentGen():
             with open(name+".json", "w") as json_file:
                   json.dump(self.new_intent, json_file, indent=6)
                               
+                              
+with open("intent2.json") as file:
+      a = IntentGen(json.load(file))
+      a.gen()
+      a.write_on_intent("intent3")
