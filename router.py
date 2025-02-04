@@ -104,11 +104,6 @@ class Router:
             for key, value in self.data[self.asn]["routers"][self.nb].items():
                  if key != "loopback":
                        self.new_content += "  network {}\n".format(get_network(value))
-
-            # get the ip networks from bgp
-            if self.nb in self.data[self.asn]["bgp"]:
-                  for value in self.data[self.asn]["bgp"][self.nb].values():
-                       self.new_content += "  network {}\n".format(get_network(value))
                        
                        
             # get the ip address of neighbors in igp
