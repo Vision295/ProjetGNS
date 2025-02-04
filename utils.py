@@ -22,7 +22,6 @@ def get_interface_name(interface_shortcut:str) -> str:
             case "g3/0" : return "Gigabitethernet2/0"
             case "f0/0" : return "Fastethernet0/0"
             case _ : return ""
-<<<<<<< HEAD
             
 def get_border_router(intent: dict) -> list[str]:
     border_routers = []
@@ -60,6 +59,4 @@ def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
                                     border_routers.append((ip.split('/')[0], other_asn))
     
     return border_routers
-=======
->>>>>>> 91cb750f002b6536afe6526534e9bdfd8755327e
 
