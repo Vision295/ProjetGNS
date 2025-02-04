@@ -63,24 +63,25 @@ class Router:
                   self.new_content += ROUTER_OSPF.format(self.nb, self.nb, self.nb, self.nb)
 
 
-            key_from_val = lambda d, f : next((k for k, v in d.items() if v == f), None)
+                  key_from_val = lambda d, f : next((k for k, v in d.items() if v == f), None)
 
-            for elem in get_border_router_ips(self.data):
-                  if elem[0] in self.data[self.asn]["routers"][self.nb].values():
-                        self.new_content += "\n passive-interface {}".format(
-                              key_from_val(self.data[self.asn]["routers"][self.nb], elem[0])
-                        )
+                  for elem in get_border_router_ips(self.data):
+                        if elem[0] in self.data[self.asn]["routers"][self.nb].values():
+                              self.new_content += "\n passive-interface {}".format(
+                                    get_interface_name(key_from_val(self.data[self.asn]["routers"][self.nb], elem[0]))
+                              )
 
-            # j'en suis là
-            if self.is_igp_ospf:
                   self.new_content += "\n!"
+
             return self.new_content
 
       def print_bgp(self):
+
             self.new_content += BGP_INTRO.format(
                   self.asn,
                   *[self.router_num for _ in range(4)]
             )
+
 
             for key in self.data[self.asn]["routers"].keys():
                   if key != self.router_num:
@@ -90,16 +91,15 @@ class Router:
                               without_net_suffix(self.data[self.asn]["routers"][key]["loopback"])
                         )
 
-            self.ebgp_neighbors = get_border_router_ips(self.data[self.asn])
             # if the router is border router than it has info in the "bgp" section of the intent file
             for ip, asnum in self.ebgp_neighbors : 
-                  self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
-                  self.new_content += " neighbor {} update-source Loopback0\n".format(ip)
+                  if ip in self.data[self.asn]["routers"].values():
+                        self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
  
             self.new_content += TRANSI_BGP
             # get the ip networks from igp
 
-            for key, value in self.data[self.asn][self.igp][self.nb].items():
+            for key, value in self.data[self.asn]["routers"][self.nb].items():
                  if key != "loopback":
                        self.new_content += "  network {}\n".format(get_network(value))
 
@@ -110,12 +110,14 @@ class Router:
                        
                        
             # get the ip address of neighbors in igp
-            for key, value in self.data[self.asn][self.igp].items():
+            for key, value in self.data[self.asn]["routers"].items():
                   if key != self.nb:
                         self.new_content += "  neighbor {} activate\n".format(without_net_suffix(value["loopback"]))
                   
             # if the router is border router than it has info in the "bgp" section of the intent file
-            for ip, _ in self.ebgp_neighbors : self.new_content += "  neighbor {} activate\n".format(ip)
+            for ip, _ in self.ebgp_neighbors : 
+                  if ip in self.data[self.asn]["routers"][self.nb].values():
+                        self.new_content += "  neighbor {} activate\n".format(ip)
 
             self.new_content += " exit-address-family\n!\n"
             return self.new_content
@@ -137,10 +139,8 @@ class Router:
             self.get_router_num()
             self.get_asn()
             self.get_igp()
-            
-            # à changer
-            self.border_router = 
-            self.list_border_routers = get_border_router_ips(extended_intent)
+
+            self.ebgp_neighbors = get_border_router_ips(self.data[self.asn])
 
             self.print_intro() 
             self.print_ospf_or_rip() 
