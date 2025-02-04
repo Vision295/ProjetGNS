@@ -61,3 +61,17 @@ def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
     
     return border_routers  # Retourne la liste des routeurs frontières
 
+def from_neighbors_to_alphabeta(neighbors:dict) -> tuple[list[str], list[str]]:
+    alpha = []
+    beta = []
+    visited_edges = set()
+
+    for node, neighbor in neighbors.items():
+        for n in neighbor:
+            edge = tuple(sorted((int(node), n)))  # Ensure uniqueness
+            if edge not in visited_edges:
+                alpha.append(edge[0])
+                beta.append(edge[1])
+                visited_edges.add(edge)
+                
+    return alpha, beta
