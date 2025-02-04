@@ -94,8 +94,9 @@ class Router:
 
             # if the router is border router than it has info in the "bgp" section of the intent file
             for ip, asnum in self.ebgp_neighbors : 
-                  if ip in self.data[self.asn]["routers"].values():
-                        self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
+                  for v in self.data[self.asn]["routers"][self.nb].values():
+                        if get_network(ip) == get_network(v) and v != ip: 
+                              self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
  
             self.new_content += TRANSI_BGP
             # get the ip networks from igp
@@ -141,7 +142,7 @@ class Router:
             self.get_asn()
             self.get_igp()
 
-            self.ebgp_neighbors = get_border_router_ips(self.data[self.asn])
+            self.ebgp_neighbors = get_border_router_ips(self.data)
 
             self.print_intro() 
             self.print_ospf_or_rip() 
