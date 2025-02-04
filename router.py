@@ -63,12 +63,15 @@ class Router:
                   self.new_content += ROUTER_OSPF.format(self.nb, self.nb, self.nb, self.nb)
 
 
-            # j'en suis là
-            # c'est la mort ici
-            for elem in get_border_router_ips(self.data):
-                  if self.nb in elem:
-                        self.new_content += "\n passive-interface {}".format(get_interface_name(elem[1]))
+            key_from_val = lambda d, f : next((k for k, v in d.items() if v == f), None)
 
+            for elem in get_border_router_ips(self.data):
+                  if elem[0] in self.data[self.asn]["routers"][self.nb].values():
+                        self.new_content += "\n passive-interface {}".format(
+                              key_from_val(self.data[self.asn]["routers"][self.nb], elem[0])
+                        )
+
+            # j'en suis là
             if self.is_igp_ospf:
                   self.new_content += "\n!"
             return self.new_content

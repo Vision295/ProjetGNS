@@ -36,9 +36,8 @@ def get_border_router(intent: dict) -> list[str]:
                                 if get_network(ip) == get_network(ip2):
                                     border_routers.append(routers)
                                     border_routers.append(routers2)
-    border_routers = set(border_routers)
-    border_routers = list(border_routers)  
-    return border_routers
+    
+    return list(set(border_routers))
     
 
 def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
@@ -61,6 +60,4 @@ def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
                                     border_routers.append((ipaddress.ip_interface(ip).compressed, other_asn))  # Ajout à la liste
     
     return border_routers  # Retourne la liste des routeurs frontières
-    
-    return border_routers
 
