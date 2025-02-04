@@ -64,9 +64,9 @@ class Router:
 
 
             # j'en suis là
-            if self.nb in self.data[self.asn]["bgp"] and self.is_igp_ospf:
-                  for key in self.data[self.asn]["bgp"][self.nb].keys():
-                        self.new_content += "\n passive-interface {}".format(get_interface_name(key))
+            for elem in get_border_router_ips(self.data):
+                  if self.nb in elem:
+                        self.new_content += "\n passive-interface {}".format(get_interface_name(elem[1]))
 
             if self.is_igp_ospf:
                   self.new_content += "\n!"
@@ -128,7 +128,7 @@ class Router:
 
       def __init__(self, input:str, extended_intent:dict):
             self.content = input
-            self.data = extended_intent
+            self.data = extended_intent["AS"]
             self.new_content = ""
 
             self.get_router_num()

@@ -45,3 +45,7 @@ def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
     
     return border_routers  # Retourne la liste des routeurs frontières
             
+
+import json
+with open("intent3.json") as file:
+    print(get_border_router_ips(json.load(file)))
