@@ -25,8 +25,8 @@ for d in directories:
                 with open(item, 'r') as file:
                     content = file.read()
                     router = Router(
-                          content=content,
-                          data=data
+                          input=content,
+                          extended_intent=data
                     )
                     print("printed on file ", file.name[-22:])
                 with open(item, 'w') as file:

@@ -11,8 +11,7 @@ class Router:
       classe for creating a router
       """ 
       
-      get_igp = lambda self: "ospf" if self.is_igp_ospf else "rip"
-
+      # à changer c'est trop moche ta fonction
       def get_router_num(self):
             """
             From the original "content" of the current config file, get the number of the router.
@@ -32,45 +31,41 @@ class Router:
             # If a number is found, convert to int and store
                         if num_str:
                               self.router_num = int(num_str)
+            self.nb = str(self.router_num)
                               
+      def get_asn(self):
+            for asn, asv in self.data.items():
+                  if self.nb in asv["routers"].keys():
+                        self.asn = asn
+                              
+      def get_igp(self):      
+            self.igp = self.data[self.asn]["igp"]
+            self.is_igp_ospf = self.igp == "ospf"
+                                       
       def print_intro(self) : self.new_content += INTRO_TEMPLATE.format(self.nb)
            
       def print_ospf_or_rip(self):
             if self.is_igp_ospf:
-                  text_igp = [
-                        "ospf",
-                        "ipv6 ospf 1 area 0",
-                        ]
+                  text_igp = "ipv6 ospf 1 area 0"
             else:
-                  text_igp = [
-                        "rip",
-                        "ipv6 rip 1 enable"
-                        ]
+                  text_igp = "ipv6 rip 1 enable"
                   
-            self.new_content += INTERFACE.format("Loopback0", self.data[text_igp[0]][self.nb]["loopback"], text_igp[1])
+            self.new_content += INTERFACE.format("Loopback0", self.data[self.asn]["routers"][self.nb]["loopback"], text_igp)
             for interface in interfaces: 
-                  if interface in self.data[text_igp[0]][self.nb]:
+                  if interface in self.data[self.asn]["routers"][self.nb]:
                         self.new_content += INTERFACE.format(
                               get_interface_name(interface),
-                              self.data[text_igp[0]][self.nb][interface],
-                              text_igp[1]
+                              self.data[self.asn]["routers"][self.nb][interface],
+                              text_igp
                         )
-
-
-            for interface in interfaces:
-                  if self.nb in self.data["bgp"]: 
-                        if interface in self.data["bgp"][self.nb]:
-                              self.new_content += INTERFACE.format(
-                                    get_interface_name(interface),
-                                    self.data["bgp"][self.nb][interface],
-                                    "!",
-                              )
 
             if self.is_igp_ospf:
                   self.new_content += ROUTER_OSPF.format(self.nb, self.nb, self.nb, self.nb)
 
-            if self.nb in self.data["bgp"] and self.is_igp_ospf:
-                  for key in self.data["bgp"][self.nb].keys():
+
+            # j'en suis là
+            if self.nb in self.data[self.asn]["bgp"] and self.is_igp_ospf:
+                  for key in self.data[self.asn]["bgp"][self.nb].keys():
                         self.new_content += "\n passive-interface {}".format(get_interface_name(key))
 
             if self.is_igp_ospf:
@@ -84,15 +79,15 @@ class Router:
                   *[self.router_num for _ in range(4)]
             )
 
-            for key in self.data[self.igp].keys():
+            for key in self.data[self.asn][self.igp].keys():
                   if key != self.router_num:
                         self.new_content += BGP_NEIGHBOR.format(
-                              without_net_suffix(self.data[self.igp][key]["loopback"]),
+                              without_net_suffix(self.data[self.asn][self.igp][key]["loopback"]),
                               111 if self.is_igp_ospf else 222,
-                              without_net_suffix(self.data[self.igp][key]["loopback"])
+                              without_net_suffix(self.data[self.asn][self.igp][key]["loopback"])
                         )
 
-            self.ebgp_neighbors = get_border_router_ips(self.data)
+            self.ebgp_neighbors = get_border_router_ips(self.data[self.asn])
             # if the router is border router than it has info in the "bgp" section of the intent file
             for ip, asnum in self.ebgp_neighbors : 
                   self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
@@ -101,18 +96,18 @@ class Router:
             self.new_content += TRANSI_BGP
             # get the ip networks from igp
 
-            for key, value in self.data[self.igp][self.nb].items():
+            for key, value in self.data[self.asn][self.igp][self.nb].items():
                  if key != "loopback":
                        self.new_content += "  network {}\n".format(get_network(value))
 
             # get the ip networks from bgp
-            if self.nb in self.data["bgp"]:
-                  for value in self.data["bgp"][self.nb].values():
+            if self.nb in self.data[self.asn]["bgp"]:
+                  for value in self.data[self.asn]["bgp"][self.nb].values():
                        self.new_content += "  network {}\n".format(get_network(value))
                        
                        
             # get the ip address of neighbors in igp
-            for key, value in self.data[self.igp].items():
+            for key, value in self.data[self.asn][self.igp].items():
                   if key != self.nb:
                         self.new_content += "  neighbor {} activate\n".format(without_net_suffix(value["loopback"]))
                   
@@ -131,16 +126,23 @@ class Router:
 
             self.new_content += OUTRO_OF_OUTRO
 
-      def __init__(self, content:str, data:dict):
-            self.content = content
-            self.data:dict = data
-            self.get_router_num()
-            self.nb = str(self.router_num)
-            self.is_igp_ospf:bool = self.router_num <= 7 # todo : à changer 
+      def __init__(self, input:str, extended_intent:dict):
+            self.content = input
+            self.data = extended_intent
             self.new_content = ""
+
+            self.get_router_num()
+            self.get_asn()
+            self.get_igp()
+            
+            # à changer
+            self.border_router = 
+            self.list_border_routers = get_border_router_ips(extended_intent)
+
             self.print_intro() 
             self.print_ospf_or_rip() 
             self.print_bgp() 
             self.print_outro() 
+
             print(self.new_content)
           
