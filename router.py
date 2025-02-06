@@ -92,11 +92,10 @@ class Router:
                               without_net_suffix(self.data[self.igp][key]["loopback"])
                         )
 
-            self.ebgp_neighbors = get_border_router_ips(self.data)
-            # if the router is border router than it has info in the "bgp" section of the intent file
-            for ip, asnum in self.ebgp_neighbors : 
-                  self.new_content += " neighbor {} remote-as {}\n".format(ip, asnum)
-                  self.new_content += " neighbor {} update-source Loopback0\n".format(ip)
+            if self.nb in self.data["bgp"].keys():
+                  self.new_content += "  neighbor {} remote-as {}\n".format(self.data["bgp"][self.nb].values(), 111 if self.is_igp_ospf else 222)
+
+            self.new_content += get_border_router_ips(self.nb, False)
  
             self.new_content += TRANSI_BGP
             # get the ip networks from igp
@@ -116,8 +115,7 @@ class Router:
                   if key != self.nb:
                         self.new_content += "  neighbor {} activate\n".format(without_net_suffix(value["loopback"]))
                   
-            # if the router is border router than it has info in the "bgp" section of the intent file
-            for ip, _ in self.ebgp_neighbors : self.new_content += "  neighbor {} activate\n".format(ip)
+            self.new_content += get_border_router_ips(self.nb, True)
 
             self.new_content += " exit-address-family\n!\n"
             return self.new_content

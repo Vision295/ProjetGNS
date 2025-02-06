@@ -19,11 +19,38 @@ def get_interface_name(interface_shortcut:str) -> str:
       match(interface_shortcut):
             case "g1/0" : return "Gigabitethernet1/0"
             case "g2/0" : return "Gigabitethernet2/0"
-            case "g3/0" : return "Gigabitethernet2/0"
+            case "g3/0" : return "Gigabitethernet3/0"
             case "f0/0" : return "Fastethernet0/0"
             case _ : return ""
             
  
+def get_border_router_ips(nb:str, isLast:bool):
+    if isLast:
+        match int(nb):
+            case 6:
+                return "  neighbor 3::1:2 remote-as 222\n"
+            case 16:
+                return "  neighbor 3::1:1 remote-as 111\n"
+            case 7:
+                return "  neighbor 3::2:2 remote-as 222\n"
+            case 17:
+                return "  neighbor 3::2:1 remote-as 111\n"
+            case _:
+                return ""
+    else:
+        match int(nb):
+            case 6:
+                return "  neighbor 3::1:2\n"
+            case 16:
+                return "  neighbor 3::1:1\n"
+            case 7:
+                return "  neighbor 3::2:2\n"
+            case 17:
+                return "  neighbor 3::2:1\n"
+            case _:
+                return ""
+ 
+"""
 def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
     border_routers = []
     as_data = intent["AS"]  # Récupération des données des AS
@@ -44,4 +71,4 @@ def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:
                                     border_routers.append((without_net_suffix(ip), other_asn))  # Ajout à la liste
     
     return border_routers  # Retourne la liste des routeurs frontières
-            
+  """          
