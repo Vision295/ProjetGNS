@@ -25,7 +25,7 @@ def get_interface_name(interface_shortcut:str) -> str:
             
  
 def get_border_router_ips(nb:str, isLast:bool):
-    if isLast:
+    if not isLast:
         match int(nb):
             case 6:
                 return "  neighbor 3::1:2 remote-as 222\n"
@@ -40,13 +40,13 @@ def get_border_router_ips(nb:str, isLast:bool):
     else:
         match int(nb):
             case 6:
-                return "  neighbor 3::1:2\n"
+                return "  neighbor 3::1:2 activate\n"
             case 16:
-                return "  neighbor 3::1:1\n"
+                return "  neighbor 3::1:1 activate\n"
             case 7:
-                return "  neighbor 3::2:2\n"
+                return "  neighbor 3::2:2 activate\n"
             case 17:
-                return "  neighbor 3::2:1\n"
+                return "  neighbor 3::2:1 activate\n"
             case _:
                 return ""
  
