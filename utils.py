@@ -24,31 +24,41 @@ def get_interface_name(interface_shortcut:str) -> str:
             case _ : return ""
             
  
-def get_border_router_ips(nb:str, isLast:bool):
-    if not isLast:
-        match int(nb):
-            case 6:
-                return "  neighbor 3::1:2 remote-as 222\n"
-            case 16:
-                return "  neighbor 3::1:1 remote-as 111\n"
-            case 7:
-                return "  neighbor 3::2:2 remote-as 222\n"
-            case 17:
-                return "  neighbor 3::2:1 remote-as 111\n"
-            case _:
-                return ""
-    else:
-        match int(nb):
-            case 6:
-                return "  neighbor 3::1:2 activate\n"
-            case 16:
-                return "  neighbor 3::1:1 activate\n"
-            case 7:
-                return "  neighbor 3::2:2 activate\n"
-            case 17:
-                return "  neighbor 3::2:1 activate\n"
-            case _:
-                return ""
+def get_border_router_ips(nb:str, isLast:bool, intentfile, is_igp_ospf):
+      if not isLast:
+            if nb in intentfile["bgp"].keys():
+                  for rnb in intentfile["bgp"].keys():
+                        if ((rnb != nb) and (get_network(list(intentfile["bgp"][rnb].values())[0])==get_network(list(intentfile["bgp"][nb].values())[0]))):
+                              return "  neighbor {} remote-as {}\n".format(without_net_suffix(list(intentfile["bgp"][rnb].values())[0]), 222 if is_igp_ospf else 111)
+            else: return ""
+      #   match int(nb):
+      #       case 6:
+      #           return "  neighbor 3::1:2 remote-as 222\n"
+      #       case 16:
+      #           return "  neighbor 3::1:1 remote-as 111\n"
+      #       case 7:
+      #           return "  neighbor 3::2:2 remote-as 222\n"
+      #       case 17:
+      #           return "  neighbor 3::2:1 remote-as 111\n"
+      #       case _:
+      #           return ""
+      else:
+            if nb in intentfile["bgp"].keys():
+                  for rnb in intentfile["bgp"].keys():
+                        if ((rnb != nb) and (get_network(list(intentfile["bgp"][rnb].values())[0])==get_network(list(intentfile["bgp"][nb].values())[0]))):
+                              return "  neighbor {} activate\n".format(without_net_suffix(list(intentfile["bgp"][rnb].values())[0]))
+            else : return ""
+      #       match int(nb):
+      #       case 6:
+      #           return "  neighbor 3::1:2 activate\n"
+      #       case 16:
+      #           return "  neighbor 3::1:1 activate\n"
+      #       case 7:
+      #           return "  neighbor 3::2:2 activate\n"
+      #       case 17:
+      #           return "  neighbor 3::2:1 activate\n"
+      #       case _:
+      #           return ""
  
 """
 def get_border_router_ips(intent: dict) -> list[tuple[str, str]]:

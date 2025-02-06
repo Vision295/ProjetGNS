@@ -95,7 +95,7 @@ class Router:
             if self.nb in self.data["bgp"].keys():
                   self.new_content += "  neighbor {} remote-as {}\n".format(self.data["bgp"][self.nb].values(), 111 if self.is_igp_ospf else 222)
 
-            self.new_content += get_border_router_ips(self.nb, False)
+            self.new_content += get_border_router_ips(self.nb, False, self.data, self.is_igp_ospf)
  
             self.new_content += TRANSI_BGP
             # get the ip networks from igp
@@ -115,7 +115,7 @@ class Router:
                   if key != self.nb:
                         self.new_content += "  neighbor {} activate\n".format(without_net_suffix(value["loopback"]))
                   
-            self.new_content += get_border_router_ips(self.nb, True)
+            self.new_content += get_border_router_ips(self.nb, True, self.data, self.is_igp_ospf)
 
             self.new_content += " exit-address-family\n!\n"
             return self.new_content
