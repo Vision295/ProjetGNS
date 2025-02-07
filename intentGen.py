@@ -29,8 +29,8 @@ class IntentGen():
             self.alpha = data["alpha"]
             self.beta = data["beta"]
 
-            self.nb_subnets = len(self.beta)
-            self.all_subnets = list(islice(self.ipRange.subnets(new_prefix=PREFIX), 0, self.nb_subnets))
+            self.nb_subnets = len(self.beta) #checked
+            self.all_subnets = list(islice(self.ipRange.subnets(new_prefix=PREFIX), 0, self.nb_subnets)) #checked
             
       def gen(self):
             self.get_networks()
@@ -42,8 +42,7 @@ class IntentGen():
       
       def get_networks(self):
             self.networks = {}
-            nb_subnets = len(self.beta)
-            self.subnets = list(islice(self.ipRange.subnets(new_prefix=PREFIX), 0, nb_subnets))
+            self.subnets = list(islice(self.ipRange.subnets(new_prefix=PREFIX), 0, self.nb_subnets))
       
             nb_subnet_taken = 0
             self.alpha.append(len(self.beta))
