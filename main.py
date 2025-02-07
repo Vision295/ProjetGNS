@@ -8,7 +8,7 @@ with open('intent.json', 'r') as file:
       data = json.load(file)
 
 
-local_path = Path("C:/Users/theop/GNS3/projects/projetalinfinidemo/project-files/dynamips")#
+local_path = Path("C:/Users/theop/GNS3/projects/projetalinfinidemo2/project-files/dynamips")#
 #local_path = Path("/mnt/c/users/pault/GNS3/projects/projetalinfini/project-files/dynamips")
 directories = []
 for d in local_path.iterdir():
