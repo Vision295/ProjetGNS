@@ -5,7 +5,7 @@ from intentGen import IntentGen
 
 
 
-with open('intent.json', 'r') as file:
+with open('simpleIntent.json', 'r') as file:
       data = json.load(file)
 
 
@@ -19,6 +19,8 @@ for d in local_path.iterdir():
 
 
 new_intent = IntentGen(data)
+print(new_intent)
+exit()
 
 for d in directories:
       dir = d / "configs/"

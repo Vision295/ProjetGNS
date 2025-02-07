@@ -53,7 +53,8 @@ class IntentGen():
                         for i, v in enumerate(self.beta[value:self.alpha[index+1]]):
                               key = (index, v)
                                    
-                              if not key in self.networks.keys() and not key in self.networks.keys() and key[0] != key[1]:
+                              if not key in self.networks.keys() and not value in self.networks.values() and key[0] != key[1]:
+                                    print(key, self.networks)
                                     self.networks[key] = self.subnets[nb_subnet_taken].compressed
                                     nb_subnet_taken += 1
 
@@ -85,6 +86,7 @@ class IntentGen():
             for key, value in self.connections.items():
                   self.what_to_add[str(key)] = {interfaces[i]: v for i, v in enumerate(value)}
                   self.what_to_add[str(key)]["loopback"] = f"1::{key}/128"
+            print(self.what_to_add)
                   
             self.new_intent = copy.deepcopy(self.data)
             for key, value in self.data['AS'].items():
@@ -98,7 +100,7 @@ class IntentGen():
                   json.dump(self.new_intent, json_file, indent=6)
                               
                               
-with open("intent2.json") as file:
+with open("simpleIntent.json") as file:
       a = IntentGen(json.load(file))
       a.gen()
       a.write_on_intent("intent3")
